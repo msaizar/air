@@ -357,13 +357,15 @@ ignore = [
     "ERA001", # commented-out code
     "PLC0414", # keep explicit alias
     # TODO -> Remove the rules below this line
-    "RUF029", # Function is declared `async`, but doesn't `await` or use `async` features.
     "ANN401", # https://docs.astral.sh/ruff/rules/any-type
 ]
 
 # A list of mappings from file pattern to rule codes or prefixes to exclude,
 # when considering any matching files. An initial '!' negates the file pattern.
 [tool.ruff.lint.per-file-ignores]
+"tests/**.py" = [
+    "RUF029", # https://docs.astral.sh/ruff/rules/async-function-with-no-await-statement
+]
 "examples/samples/**.py" = [
     "F403", # https://docs.astral.sh/ruff/rules/undefined-local-with-import-star
     "F405", # https://docs.astral.sh/ruff/rules/undefined-local-with-import-star-usage
@@ -371,6 +373,7 @@ ignore = [
 ]
 "examples/**.py" = [
     "T20", # https://docs.astral.sh/ruff/rules/#flake8-print-t20
+    "RUF029", # https://docs.astral.sh/ruff/rules/async-function-with-no-await-statement
 ]
 "scripts/copy_src_example_to_callable.py" = ["C901"]
 "src/air/tags/utils.py" = ["PLC0415"]
