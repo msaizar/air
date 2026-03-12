@@ -4,6 +4,7 @@ from collections.abc import Mapping
 from typing import override
 
 from fastapi import status
+from fastapi.sse import EventSourceResponse, format_sse_event
 from starlette.background import BackgroundTask
 from starlette.datastructures import URL
 from starlette.responses import (
@@ -37,7 +38,7 @@ TagResponse = AirResponse
 """Alias for the `AirResponse` Response class; use it if it improves clarity."""
 
 
-class SSEResponse(StreamingResponse):
+class SSEResponse(EventSourceResponse):
     """Response class for Server Sent Events
 
     Example:
@@ -84,8 +85,6 @@ class SSEResponse(StreamingResponse):
             return air.SSEResponse(lottery_generator())
     """
 
-    media_type = "text/event-stream"
-
     async def stream_response(self, send: Send) -> None:
         await send(
             {
@@ -96,11 +95,7 @@ class SSEResponse(StreamingResponse):
         )
         async for chunk in self.body_iterator:
             if not isinstance(chunk, bytes | memoryview):
-                lines = list(str(chunk).splitlines())
-                formatted = [f"data: {t}" for t in lines]
-                data = "\n".join(formatted)
-                chunk = f"event: message\n{data}\n\n"
-                chunk = chunk.encode(self.charset)
+                chunk = format_sse_event(data_str=str(chunk), event="message")
             await send({"type": "http.response.body", "body": chunk, "more_body": True})
 
         await send({"type": "http.response.body", "body": b"", "more_body": False})
